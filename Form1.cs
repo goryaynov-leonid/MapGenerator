@@ -17,12 +17,12 @@ namespace MapGenerator
         public Form1()
         {
             InitializeComponent();
-            Map = Map.GetMap(100, 100);
+            
         }
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            Map.Reset();
+            Map = new Map(100, 100);
             MapBuilder mapBuilder = new MapBuilder();
             Map = mapBuilder.StartMapBuild(2, 0, 0, ref Map);
             pictureBox1.Image = GetBitmap();
