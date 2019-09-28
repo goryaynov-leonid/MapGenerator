@@ -14,8 +14,10 @@ namespace MapGenerator.MapBuild
             ref Map curMap = ref map;
             LayerBuilder = new ForestLayerBuilder();
             curMap = LayerBuilder.BuildLayer(ref curMap, Forests, 100, 200);
+            LayerBuilder = new MountainLayerBuilder();
+            curMap = LayerBuilder.BuildLayer(ref curMap, Mountains, 100, 200);
             LayerBuilder = new RiverLayerBuilder();
-            curMap = LayerBuilder.BuildLayer(ref curMap, Rivers, 100, 200);
+            curMap = LayerBuilder.BuildLayer(ref curMap, Rivers, 200, 300);
 
             return ref curMap;
         }

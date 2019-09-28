@@ -7,84 +7,85 @@ using System.Threading.Tasks;
 
 namespace MapGenerator.MapBuild
 {
-    class RiverLayerBuilder : LayerBuilder
+    class MountainLayerBuilder : LayerBuilder
     {
-        private static Random Random = new Random(Guid.NewGuid().GetHashCode());
-        private static List<int> patternX = new List<int> { 1, 1, 0, -1, -1, -1, 0, 1 };
-        private static List<int> patternY = new List<int> { 0, 1, 1, 1, 0, -1, -1, -1 };
+        private Random Random = new Random(Guid.NewGuid().GetHashCode());
+        private List<int> patternX = new List<int> { 1, 1, 0, -1, -1, -1, 0, 1 };
+        private List<int> patternY = new List<int> { 0, 1, 1, 1, 0, -1, -1, -1 };
         private List<List<double>> probability;
-        private static List<List<double>> probabilitySum;
+        private List<List<double>> probabilitySum;
         public ref Map BuildLayer(ref Map map, int centersCount, int minSize, int maxSize)
         {
             InitProbability();
-
-            int startWay = Random.Next(probability.Count);
 
             for (int i = 0; i < centersCount; i++)
             {
                 Map tempMap = map;
 
-                PutRiverOnMap(ref tempMap, minSize, maxSize, startWay);
-                
+                PutMountainOnMap(ref tempMap, minSize, maxSize);
+
                 map = tempMap;
             }
             return ref map;
         }
 
-        private void PutRiverOnMap(ref Map tempMap, int minSize, int maxSize, int startWay)
+        private void PutMountainOnMap(ref Map tempMap, int minSize, int maxSize)
         {
-            int curCenter = GetNewCenter(ref tempMap);
-            
+            int curCenter = FindNewCenter(ref tempMap);
 
-            List<RiverCell> curRiver = new List<RiverCell>();
+            List<(MountainCell, int)> curMountain = new List<(MountainCell, int)>();
 
-            RiverCell riverCell = new RiverCell(curCenter, tempMap.W);
-            curRiver.Add(riverCell);
-            tempMap.Cells[curCenter] = riverCell;
+            MountainCell MountainCell = new MountainCell(curCenter, tempMap.W);
+            curMountain.Add((MountainCell, Random.Next(probability.Count)));
+            tempMap.Cells[curCenter] = MountainCell;
 
 
             int size = Random.Next(minSize, maxSize);
 
-            int way = startWay;
-
             for (int j = 0; j < size; j++)
             {
-                if (CheckToFinishRiver(curRiver.Last(), ref tempMap))
-                {
-                    break;
-                }
+                (MountainCell, int) curCell = GetCurCellToGrow(curMountain, ref tempMap);
 
-                RiverCell curCell = curRiver.Last();
+                int w = GetNewWay(curCell, ref tempMap);
 
-                int w = GetNewWay(way, curCell, ref tempMap);
+                int way = (w + 4) % 8;
+                int x = curCell.Item1.X + patternX[w];
+                int y = curCell.Item1.Y + patternY[w];
 
-                way = (w + 4) % 8;
-                int x = curCell.X + patternX[w];
-                int y = curCell.Y + patternY[w];
+                MountainCell newMountainCell = new MountainCell(x * tempMap.W + y, tempMap.W);
 
-                RiverCell newRiverCell = new RiverCell(x * tempMap.W + y, tempMap.W);
-
-                tempMap.Cells[x * tempMap.H + y] = newRiverCell;
-                curRiver.Add(newRiverCell);
+                tempMap.Cells[x * tempMap.H + y] = newMountainCell;
+                curMountain.Add((newMountainCell, way));
             }
         }
 
-        public static int GetNewWay(int oldWay, RiverCell curCell, ref Map tempMap)
+        private int GetNewWay((MountainCell, int) curCell, ref Map tempMap)
         {
             int way;
             double p;
             do
             {
                 p = Random.NextDouble();
-                way = Array.BinarySearch(probabilitySum[oldWay].ToArray(), p);
+                way = Array.BinarySearch(probabilitySum[curCell.Item2].ToArray(), p);
                 way = (way >= 0) ? way : ~way;
             }
-            while (!(Validate(curCell.X + patternX[way], curCell.Y + patternY[way], tempMap.H, tempMap.W) &&
-                    !(tempMap.Cells[(curCell.X + patternX[way]) * tempMap.H + curCell.Y + patternY[way]] is RiverCell)));
+            while (!(Validate(curCell.Item1.X + patternX[way], curCell.Item1.Y + patternY[way], tempMap.H, tempMap.W) &&
+                    !(tempMap.Cells[(curCell.Item1.X + patternX[way]) * tempMap.H + curCell.Item1.Y + patternY[way]] is MountainCell)));
             return way;
         }
 
-        private int GetNewCenter(ref Map tempMap)
+        private (MountainCell, int) GetCurCellToGrow(List<(MountainCell, int)> curMountain, ref Map tempMap)
+        {
+            (MountainCell, int) curCell;
+            do
+            {
+                curCell = curMountain[curMountain.Count - 1 - (int)(Random.Next(curMountain.Count) * 0.2)];
+            }
+            while (Check(curCell.Item1, ref tempMap));
+            return curCell;
+        }
+
+        private int FindNewCenter(ref Map tempMap)
         {
             int curCenter;
             do
@@ -95,12 +96,12 @@ namespace MapGenerator.MapBuild
             return curCenter;
         }
 
-        public static bool CheckToFinishRiver(RiverCell cell, ref Map map)
+        private bool Check(MountainCell cell, ref Map map)
         {
             for (int i = 0; i < patternX.Count; i++)
             {
-                if (Validate(cell.X + patternX[i], cell.Y + patternY[i], map.H, map.W) && 
-                    !(map.Cells[(cell.X + patternX[i]) * map.W + cell.Y + patternY[i]] is RiverCell))
+                if (Validate(cell.X + patternX[i], cell.Y + patternY[i], map.H, map.W) &&
+                    !(map.Cells[(cell.X + patternX[i]) * map.W + cell.Y + patternY[i]] is MountainCell))
                 {
                     return false;
                 }
@@ -108,7 +109,7 @@ namespace MapGenerator.MapBuild
             return true;
         }
 
-        public static bool Validate(int i, int j, int x, int y)
+        private bool Validate(int i, int j, int x, int y)
         {
             return i >= 0 && j >= 0 && i < x && j < y;
         }
@@ -138,7 +139,8 @@ namespace MapGenerator.MapBuild
             }
         }
 
-        public static List<Cell> GetNeigh(Cell cell, ref Map map)
+        //func to debug
+        private List<Cell> GetNeigh(Cell cell, ref Map map)
         {
             List<Cell> ans = new List<Cell>();
             for (int i = 0; i < 8; i++)
