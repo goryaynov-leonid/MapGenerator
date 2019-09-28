@@ -33,14 +33,9 @@ namespace MapGenerator.MapBuild
                 }
                 while (tempMap.Cells[curCenter] is ForestCell);
 
-                List<Cell> curForest = new List<Cell>();
+                List<ForestCell> curForest = new List<ForestCell>();
 
-                ForestCell forestCell = new ForestCell()
-                {
-                    I = map.Cells[curCenter].I,
-                    X = map.Cells[curCenter].X,
-                    Y = map.Cells[curCenter].Y
-                };
+                ForestCell forestCell = new ForestCell(curCenter, map.W);
                 curForest.Add(forestCell);
                 tempMap.Cells[curCenter] = forestCell;
 
@@ -49,7 +44,7 @@ namespace MapGenerator.MapBuild
 
                 for (int j = 0; j < size; j++)
                 {
-                    Cell curCell;
+                    ForestCell curCell;
 
                     do
                     {
@@ -66,12 +61,12 @@ namespace MapGenerator.MapBuild
                         r = (r >= 0) ? r : ~r;
                     }
                     while (!(Validate(curCell.X + patternX[r], curCell.Y + patternY[r], tempMap.H, tempMap.W) &&
-                            !(tempMap.Cells[(curCell.X + patternX[r]) * tempMap.H + curCell.Y + patternY[r]] is ForestCell)));
+                            !(tempMap.Cells[(curCell.X + patternX[r]) * tempMap.W + curCell.Y + patternY[r]] is ForestCell)));
 
                     int x = curCell.X + patternX[r];
                     int y = curCell.Y + patternY[r];
 
-                    ForestCell newForestCell = new ForestCell() { I = x * map.H + y, X = x, Y = y };
+                    ForestCell newForestCell = new ForestCell(x * map.H + y, map.H);
 
                     tempMap.Cells[x * map.H + y] = newForestCell;
                     curForest.Add(newForestCell);

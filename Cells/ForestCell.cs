@@ -9,9 +9,12 @@ namespace MapGenerator.Cells
 {
     class ForestCell : Cell
     {
-        public ForestCell()
+        public ForestCell(int i, int w)
         {
             color = Color.DarkGreen;
+            I = i;
+            X = i / w;
+            Y = i % w;
         }
     }
 }

@@ -9,9 +9,12 @@ namespace MapGenerator.Cells
 {
     class RiverCell : Cell
     {
-        public RiverCell()
+        public RiverCell(int i, int w)
         {
             color = Color.Blue;
+            I = i;
+            X = i / w;
+            Y = i % w;
         }
     }
 }

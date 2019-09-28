@@ -19,7 +19,7 @@ namespace MapGenerator
             W = w;
             for (int i = 0; i < h*w; i++)
             {
-                Cells.Add(new GrassCell() { I = i, X = i / h, Y = i % h });
+                Cells.Add(new GrassCell(i, w));
             }
         }
     }

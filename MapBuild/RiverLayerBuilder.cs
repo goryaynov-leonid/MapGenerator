@@ -31,63 +31,59 @@ namespace MapGenerator.MapBuild
 
                 List<RiverCell> curRiver = new List<RiverCell>();
 
-                ForestCell forestCell = new ForestCell()
-                {
-                    I = map.Cells[curCenter].I,
-                    X = map.Cells[curCenter].X,
-                    Y = map.Cells[curCenter].Y
-                };
-                curRiver.Add(forestCell);
-                tempMap.Cells[curCenter] = forestCell;
+                RiverCell riverCell = new RiverCell(curCenter, tempMap.W);
+                curRiver.Add(riverCell);
+                tempMap.Cells[curCenter] = riverCell;
 
 
                 int size = Random.Next(minSize, maxSize);
 
+                int way = Random.Next(probability.Count);
+
                 for (int j = 0; j < size; j++)
                 {
-                    Cell curCell;
-
-                    do
+                    if (CheckToFinishRiver(curRiver.Last(), ref tempMap))
                     {
-                        curCell = curRiver[Random.Next(curRiver.Count)];
+                        break;
                     }
-                    while (!Check(curCell, ref map));
 
-                    int r = 0;
+                    RiverCell curCell = curRiver.Last();
+
+                    int r;
                     double p;
                     do
                     {
                         p = Random.NextDouble();
-                        r = Array.BinarySearch(probabilitySum.ToArray(), p);
+                        r = Array.BinarySearch(probabilitySum[way].ToArray(), p);
                         r = (r >= 0) ? r : ~r;
                     }
                     while (!(Validate(curCell.X + patternX[r], curCell.Y + patternY[r], tempMap.H, tempMap.W) &&
-                            !(tempMap.Cells[(curCell.X + patternX[r]) * tempMap.H + curCell.Y + patternY[r]] is ForestCell)));
-
+                            !(tempMap.Cells[(curCell.X + patternX[r]) * tempMap.H + curCell.Y + patternY[r]] is RiverCell)));
+                    way = (r + 4) % 8;
                     int x = curCell.X + patternX[r];
                     int y = curCell.Y + patternY[r];
 
-                    ForestCell newForestCell = new ForestCell() { I = x * map.H + y, X = x, Y = y };
+                    RiverCell newRiverCell = new RiverCell(x * map.W + y, map.W);
 
-                    tempMap.Cells[x * map.H + y] = newForestCell;
-                    curRiver.Add(newForestCell);
+                    tempMap.Cells[x * map.H + y] = newRiverCell;
+                    curRiver.Add(newRiverCell);
                 }
                 map = tempMap;
             }
             return ref map;
         }
 
-        private bool Check(Cell cell, ref Map map)
+        private bool CheckToFinishRiver(RiverCell cell, ref Map map)
         {
             for (int i = 0; i < patternX.Count; i++)
             {
-                if (Validate(cell.X + patternX[i], cell.Y + patternY[i], map.H, map.W))
+                if (Validate(cell.X + patternX[i], cell.Y + patternY[i], map.H, map.W) && 
+                    !(map.Cells[(cell.X + patternX[i]) * map.W + cell.Y + patternY[i]] is RiverCell))
                 {
-                    if (!(map.Cells[(cell.X + patternX[i]) * map.H + cell.Y + patternY[i]] is ForestCell))
-                        return true;
+                    return false;
                 }
             }
-            return false;
+            return true;
         }
 
         private bool Validate(int i, int j, int x, int y)
@@ -108,7 +104,7 @@ namespace MapGenerator.MapBuild
             for (int i = 0; i < probability.Count; i++)
             {
                 probabilitySum.Add(new List<double>() { probability[i][0] });
-                for (int j = 0; j < probability[i].Count; j++)
+                for (int j = 1; j < probability[i].Count; j++)
                 {
                     probabilitySum[i].Add(probabilitySum[i].Last() + probability[i][j]);
                 }

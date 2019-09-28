@@ -9,9 +9,12 @@ namespace MapGenerator.Cells
 {
     class GrassCell : Cell
     {
-        public GrassCell()
+        public GrassCell(int i, int w)
         {
             color = Color.LightGreen;
+            I = i;
+            X = i / w;
+            Y = i % w;
         }
     }
 }

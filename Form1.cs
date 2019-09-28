@@ -24,7 +24,7 @@ namespace MapGenerator
         {
             Map = new Map(100, 100);
             MapBuilder mapBuilder = new MapBuilder();
-            Map = mapBuilder.StartMapBuild(2, 0, 0, ref Map);
+            Map = mapBuilder.StartMapBuild(2, 2, 0, ref Map);
             pictureBox1.Image = GetBitmap();
         }
 

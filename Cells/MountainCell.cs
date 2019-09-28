@@ -9,9 +9,12 @@ namespace MapGenerator.Cells
 {
     class MountainCell : Cell
     {
-        public MountainCell()
+        public MountainCell(int i, int w)
         {
             color = Color.Gray;
+            I = i;
+            X = i / w;
+            Y = i % w;
         }
     }
 }
