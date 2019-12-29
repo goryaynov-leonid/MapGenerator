@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MapGenerator.Cells
 {
-    abstract class Cell
+    public abstract class Cell
     {
         public Color color;
         public int I { get; set; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MapGenerator.Cells
 {
-    class ForestCell : Cell
+    public class ForestCell : Cell
     {
         public ForestCell(int i, int w)
         {

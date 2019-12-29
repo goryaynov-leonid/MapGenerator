@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MapGenerator.MapBuild
 {
-    class ForestLayerBuilder : LayerBuilder
+    public class ForestLayerBuilder : LayerBuilder
     {
         private static Random Random = new Random(Guid.NewGuid().GetHashCode());
         private static List<int> patternX = new List<int> { 1, -1, 0, 0 };

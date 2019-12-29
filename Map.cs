@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MapGenerator
 {
-    sealed class Map
+    public sealed class Map
     {
         public List<Cell> Cells { get; set; }
         public int W;
