@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MapGenerator.MapBuild;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using System.Linq;
 
@@ -21,7 +21,7 @@ namespace MapGeneratorTests
 
             //assert
 
-            Debug.Assert(map.Cells.Count(x => x is MapGenerator.Cells.ForestCell) > 0);
+            Debug.Assert(map.Cells.Any(x => x is MapGenerator.Cells.ForestCell));
         }
     }
 }

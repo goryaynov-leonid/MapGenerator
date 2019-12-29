@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MapGenerator\MapGenerator.csproj" />
+    <ProjectReference Include="..\MapGenerator.csproj" />
   </ItemGroup>
 
 </Project>
