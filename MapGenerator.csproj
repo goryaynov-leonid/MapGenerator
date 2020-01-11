@@ -51,7 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cells\Cell.cs" />
-    <Compile Include="Cells\CellFactory.cs" />
     <Compile Include="Cells\ForestCell.cs" />
     <Compile Include="Cells\GrassCell.cs" />
     <Compile Include="Cells\MountainCell.cs" />
